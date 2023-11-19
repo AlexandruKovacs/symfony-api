@@ -36,6 +36,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     denormalizationContext: [
         'groups' => ['write:Post'],
     ], // POST, PUT, PATCH
+    paginationItemsPerPage: 10
 )]
 class Post
 {
