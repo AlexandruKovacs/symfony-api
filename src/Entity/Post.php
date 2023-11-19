@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ApiResource(
+    description: 'Información de los posts con titulo, contenido y categoría',
     operations: [
         new Get(
             normalizationContext: [
@@ -49,22 +50,39 @@ class Post
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Groups(['read:Post'])]
+    /**
+     * @var int|null
+     * Identificador del post
+     */
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['read:Post', 'write:Post'])]
     #[Assert\NotBlank]
+    /**
+     * @var string|null
+     * Título del post
+     */
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['read:item:Post', 'write:Post'])]
     #[Assert\NotBlank]
+    /**
+     * @var string|null
+     * Contenido del post
+     */
     private ?string $body = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:Post', 'write:Post'])]
     #[Assert\NotBlank]
+    /**
+     * @var Category|null
+     * Categoría del post
+     * Relación de muchos a uno
+     */
     private ?Category $category = null;
 
     public function getId(): ?int
@@ -90,6 +108,11 @@ class Post
     }
 
     #[Groups(['read:collection:Post'])]
+    /**
+     * @return string|null
+     * Resumen del post
+     * Devuelve los primeros 70 caracteres del contenido
+     */
     public function getSummary(): ?string
     {
         if(mb_strlen($this->body) <= 70) {
