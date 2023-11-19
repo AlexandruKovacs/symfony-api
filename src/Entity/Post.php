@@ -34,12 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Patch(),
         new Store(),
     ],
-    // normalizationContext: [
-    // 'groups' => ['read:Post'],
-    // ], // GET
-    denormalizationContext: [
-        'groups' => ['write:Post'],
-    ], // POST, PUT, PATCH
+    denormalizationContext: ['groups' => ['write:Post']], // POST, PUT, PATCH
     paginationItemsPerPage: 10
 )]
 #[ApiFilter(SearchFilter::class, properties: [
