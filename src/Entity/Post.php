@@ -11,6 +11,10 @@ use App\Repository\PostRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -38,6 +42,12 @@ use Symfony\Component\Validator\Constraints as Assert;
     ], // POST, PUT, PATCH
     paginationItemsPerPage: 10
 )]
+#[ApiFilter(SearchFilter::class, properties: [
+    'title'         => 'partial', // exact, partial, start, end, word_start
+    'body'          => 'partial',
+    'category.name' => 'partial'
+])]
+#[ApiFilter(OrderFilter::class, properties: ['id'])]
 class Post
 {
     #[ORM\Id]
