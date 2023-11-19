@@ -11,30 +11,50 @@ use App\Repository\PostRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Serializer\Annotation\Groups;
+
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ApiResource(
     operations: [
-        new Get(),
-        new GetCollection(),
+        new Get(
+            normalizationContext: [
+                'groups' => ['read:Post', 'read:item:Post'],
+            ],
+        ),
+        new GetCollection(
+            normalizationContext: [
+                'groups' => ['read:Post', 'read:collection:Post'],
+            ],
+        ),
         new Patch(),
         new Store(),
-    ]
+    ],
+    // normalizationContext: [
+    // 'groups' => ['read:Post'],
+    // ], // GET
+    denormalizationContext: [
+        'groups' => ['write:Post'],
+    ], // POST, PUT, PATCH
 )]
 class Post
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['read:Post'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['read:Post', 'write:Post'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['read:item:Post', 'write:Post'])]
     private ?string $body = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:Post', 'write:Post'])]
     private ?Category $category = null;
 
     public function getId(): ?int
@@ -57,6 +77,15 @@ class Post
     public function getBody(): ?string
     {
         return $this->body;
+    }
+
+    #[Groups(['read:collection:Post'])]
+    public function getSummary(): ?string
+    {
+        if(mb_strlen($this->body) <= 70) {
+            return $this->body;
+        }
+        return mb_substr($this->body, 0, 70) . '...';
     }
 
     public function setBody(string $body): static
